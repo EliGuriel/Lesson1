@@ -5,6 +5,7 @@ import org.example.stage5.exception.NotExists;
 import org.example.stage5.exception.StudentIdAndIdMismatch;
 import org.example.stage5.model.Student;
 import org.example.stage5.service.StudentService;
+import org.example.stage5.service.StudentServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,22 +17,22 @@ import java.util.List;
 @RequestMapping("/student")
 public class StudentController {
 
-    private final StudentService studentService;
+    private final StudentService studentServiceImpl;
 
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
+    public StudentController(StudentServiceImpl studentServiceImpl) {
+        this.studentServiceImpl = studentServiceImpl;
     }
 
     @GetMapping("/getAllStudents")
     public ResponseEntity<List<Student>> getAllStudents() {
-        List<Student> studentList = studentService.getAllStudents();
+        List<Student> studentList = studentServiceImpl.getAllStudents();
         return ResponseEntity.ok(studentList); // 200 OK
     }
 
     @PostMapping("/addStudent")
     public ResponseEntity<Object> addStudent(@RequestBody Student student) {
         try {
-            Student added = studentService.addStudent(student);
+            Student added = studentServiceImpl.addStudent(student);
 
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest()
@@ -48,7 +49,7 @@ public class StudentController {
     @PutMapping("/updateStudent/{id}")
     public ResponseEntity<Object> updateStudent(@RequestBody Student student, @PathVariable Long id) {
         try {
-            Student updated = studentService.updateStudent(student, id);
+            Student updated = studentServiceImpl.updateStudent(student, id);
             return ResponseEntity.ok(updated); // 200 OK
         } catch (NotExists | StudentIdAndIdMismatch e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -58,7 +59,7 @@ public class StudentController {
     @DeleteMapping("/deleteStudent/{id}")
     public ResponseEntity<Object> deleteStudent(@PathVariable Long id) {
         try {
-            studentService.deleteStudent(id);
+            studentServiceImpl.deleteStudent(id);
             return ResponseEntity.noContent().build(); // 204 No Content
         } catch (NotExists e) {
             return ResponseEntity.notFound().build(); //  notFound()

@@ -3,6 +3,7 @@ package org.example.stage4.controller;
 
 import org.example.stage4.model.Student;
 import org.example.stage4.service.StudentService;
+import org.example.stage4.service.StudentServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,29 +12,29 @@ import java.util.List;
 @RequestMapping("/student")
 public class StudentController {
 
-    private final StudentService studentService;
+    private final StudentService studentServiceImpl;
 
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
+    public StudentController(StudentServiceImpl studentServiceImpl) {
+        this.studentServiceImpl = studentServiceImpl;
     }
 
     @GetMapping("/getAllStudents")
     public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
+        return studentServiceImpl.getAllStudents();
     }
 
     @PostMapping("/addStudent")
     public String addStudent(@RequestBody Student student) {
-        return studentService.addStudent(student);
+        return studentServiceImpl.addStudent(student);
     }
 
-    @PutMapping("/updateStudent")
+    @PutMapping("/updateStudent") // not good practice - should br use with id as well, path variable
     public String updateStudent(@RequestBody Student student) {
-        return studentService.updateStudent(student);
+        return studentServiceImpl.updateStudent(student);
     }
 
     @DeleteMapping("/deleteStudent/{id}")
     public String deleteStudent(@PathVariable Long id) {
-        return studentService.deleteStudent(id);
+        return studentServiceImpl.deleteStudent(id);
     }
 }

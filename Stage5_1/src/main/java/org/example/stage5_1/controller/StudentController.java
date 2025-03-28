@@ -2,6 +2,7 @@ package org.example.stage5_1.controller;
 
 import org.example.stage5_1.model.Student;
 import org.example.stage5_1.service.StudentService;
+import org.example.stage5_1.service.StudentServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -13,21 +14,21 @@ import java.util.List;
 @RequestMapping("/student")
 public class StudentController {
 
-    private final StudentService studentService;
+    private final StudentService studentServiceImpl;
 
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
+    public StudentController(StudentServiceImpl studentServiceImpl) {
+        this.studentServiceImpl = studentServiceImpl;
     }
 
     @GetMapping("/getAllStudents")
     public ResponseEntity<List<Student>> getAllStudents() {
-        List<Student> studentList = studentService.getAllStudents();
+        List<Student> studentList = studentServiceImpl.getAllStudents();
         return ResponseEntity.ok(studentList); // 200 OK
     }
 
     @PostMapping("/addStudent")
     public ResponseEntity<Student> addStudent(@RequestBody Student student) {
-        Student added = studentService.addStudent(student);
+        Student added = studentServiceImpl.addStudent(student);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -40,13 +41,13 @@ public class StudentController {
 
     @PutMapping("/updateStudent/{id}")
     public ResponseEntity<Student> updateStudent(@RequestBody Student student, @PathVariable Long id) {
-        Student updated = studentService.updateStudent(student, id);
+        Student updated = studentServiceImpl.updateStudent(student, id);
         return ResponseEntity.ok(updated); // 200 OK
     }
 
     @DeleteMapping("/deleteStudent/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-        studentService.deleteStudent(id);
+        studentServiceImpl.deleteStudent(id);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 }

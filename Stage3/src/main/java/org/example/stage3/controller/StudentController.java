@@ -13,14 +13,14 @@ import java.util.List;
 @RequestMapping("/student")
 public class StudentController {
 
-    private final StudentService studentService;
+    private final StudentService studentServiceImpl;
 
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
+    public StudentController(StudentService studentServiceImpl) {
+        this.studentServiceImpl = studentServiceImpl;
     }
 
     @GetMapping("/getAllStudents")
     public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
+        return studentServiceImpl.getAllStudents();
     }
 }

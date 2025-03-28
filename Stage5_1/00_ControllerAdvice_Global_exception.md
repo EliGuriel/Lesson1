@@ -1,4 +1,3 @@
-
 <div dir="rtl">
 
 # מנגנון טיפול בחריגות ב-Spring Boot
@@ -26,30 +25,31 @@ sequenceDiagram
     
     Client->>Controller: בקשת HTTP
     
-    rect rgb(0, 0, 0)
-    note right of Controller: מקרה 1: שגיאת ולידציה
-    Controller->>Controller: בדיקת ולידציה של הקלט (@Valid)
-    Controller--xExHandler: MethodArgumentNotValidException
-    ExHandler-->>Client: תגובת שגיאה 400 Bad Request
-    end
-    
     rect rgb(20, 20, 20)
-    note right of Controller: מקרה 2: משאב לא נמצא
+    note right of Controller: מקרה 1: משאב לא נמצא
     Controller->>Service: קריאה לשירות
-    Service--xController: זריקת NotFoundException
-    Controller--xExHandler: העברת NotFoundException
+    Service--xController: זריקת NotExists
+    Controller--xExHandler: העברת NotExists
     ExHandler-->>Client: תגובת שגיאה 404 Not Found
     end
     
-    rect rgb(0, 0, 0)
-    note right of Controller: מקרה 3: קלט לא תקין
+    rect rgb(40, 40, 40)
+    note right of Controller: מקרה 2: משאב כבר קיים
     Controller->>Service: קריאה לשירות
-    Service--xController: זריקת IllegalArgumentException
-    Controller--xExHandler: העברת IllegalArgumentException
+    Service--xController: זריקת AlreadyExists
+    Controller--xExHandler: העברת AlreadyExists
+    ExHandler-->>Client: תגובת שגיאה 409 Conflict
+    end
+    
+    rect rgb(60, 60, 60)
+    note right of Controller: מקרה 3: אי התאמה בזיהוי
+    Controller->>Service: קריאה לשירות
+    Service--xController: זריקת StudentIdAndIdMismatch
+    Controller--xExHandler: העברת StudentIdAndIdMismatch
     ExHandler-->>Client: תגובת שגיאה 400 Bad Request
     end
     
-    rect rgb(20, 20, 20)
+    rect rgb(80, 80, 80)
     note right of Controller: מקרה 4: שגיאה כללית
     Controller->>Service: קריאה לשירות
     Service--xController: זריקת Exception אחרת
@@ -64,15 +64,27 @@ sequenceDiagram
 
 ### 1. חריגות מותאמות אישית
 
-יצרנו מחלקת חריגה מותאמת אישית `NotFoundException` שמשמשת למקרים שבהם משאב מבוקש (כמו סטודנט) לא נמצא:
+יצרנו מספר מחלקות חריגה מותאמות אישית לטיפול במקרים שונים:
 
 </div>
 
 ```java
-package org.example.stage6.exception;
+package org.example.stage5_2.exception;
 
-public class NotFoundException extends RuntimeException {
-    public NotFoundException(String message) {
+public class NotExists extends RuntimeException {
+    public NotExists(String message) {
+        super(message);
+    }
+}
+
+public class AlreadyExists extends RuntimeException {
+    public AlreadyExists(String message) {
+        super(message);
+    }
+}
+
+public class StudentIdAndIdMismatch extends RuntimeException {
+    public StudentIdAndIdMismatch(String message) {
         super(message);
     }
 }
@@ -92,7 +104,7 @@ public class NotFoundException extends RuntimeException {
 </div>
 
 ```java
-package org.example.stage6.model;
+package org.example.stage5_2.model;
 
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -125,64 +137,43 @@ public class ErrorResponse {
 </div>
 
 ```java
-package org.example.stage6.exception;
+package org.example.stage5_2.exception;
 
-import org.example.stage6.model.ErrorResponse;
+import org.example.stage5_2.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> 
-            errors.put(error.getField(), error.getDefaultMessage())
-        );
-        
-        ErrorResponse errorResponse = new ErrorResponse(
-            "Validation failed",
-            errors.toString()
-        );
-        
-        return ResponseEntity.badRequest().body(errorResponse);
+    @ExceptionHandler(NotExists.class)
+    public ResponseEntity<Object> handleNotExists(NotExists ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("Resource Not Found", ex.getMessage()));
     }
-    
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            "Resource not found",
-            ex.getMessage()
-        );
-        
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+
+    @ExceptionHandler(AlreadyExists.class)
+    public ResponseEntity<Object> handleAlreadyExists(AlreadyExists ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("Resource Conflict", ex.getMessage()));
     }
-    
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            "Invalid input",
-            ex.getMessage()
-        );
-        
-        return ResponseEntity.badRequest().body(errorResponse);
+
+    @ExceptionHandler(StudentIdAndIdMismatch.class)
+    public ResponseEntity<Object> handleIdMismatch(StudentIdAndIdMismatch ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("ID Mismatch", ex.getMessage()));
     }
-    
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-            "Internal server error",
-            ex.getMessage()
-        );
-        
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    public ResponseEntity<Object> handleGenericException(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Internal Server Error", ex.getMessage()));
     }
 }
 ```
@@ -199,13 +190,15 @@ public class GlobalExceptionHandler {
 
 כל מתודה במחלקת ה-`GlobalExceptionHandler` שמסומנת באנוטציה `@ExceptionHandler` מגדירה איזה סוג חריגה היא מטפלת בו. למשל:
 
-- `@ExceptionHandler(NotFoundException.class)` - מטפלת בחריגות מסוג `NotFoundException`
+- `@ExceptionHandler(NotExists.class)` - מטפלת בחריגות מסוג `NotExists`
+- `@ExceptionHandler(AlreadyExists.class)` - מטפלת בחריגות מסוג `AlreadyExists`
 - `@ExceptionHandler(Exception.class)` - רשת ביטחון שתופסת כל חריגה אחרת
 
 ### 3. סדר מטפלי החריגה
 
 Spring ינסה למצוא את המטפל הספציפי ביותר לחריגה שנזרקה. למשל:
-- אם נזרקה `NotFoundException`, המתודה `handleNotFoundException` תטפל בה
+- אם נזרקה `NotExists`, המתודה `handleNotExists` תטפל בה
+- אם נזרקה `AlreadyExists`, המתודה `handleAlreadyExists` תטפל בה
 - אם נזרקה חריגה שאין לה מטפל ספציפי, המתודה `handleGenericException` תטפל בה כמוצא אחרון
 
 זה מתואר בתרשים הזרימה הבא:
@@ -215,51 +208,66 @@ Spring ינסה למצוא את המטפל הספציפי ביותר לחריג�
 ```mermaid
 flowchart TD
     A[חריגה נזרקת] --> B{סוג החריגה?}
-    B -->|MethodArgumentNotValidException| C[handleValidationExceptions]
-    B -->|NotFoundException| D[handleNotFoundException]
-    B -->|IllegalArgumentException| E[handleIllegalArgumentException]
-    B -->|חריגה אחרת| F[handleGenericException]
+    B -->|NotExists| D[handleNotExists]
+    B -->|AlreadyExists| E[handleAlreadyExists]
+    B -->|StudentIdAndIdMismatch| F[handleIdMismatch]
+    B -->|חריגה אחרת| G[handleGenericException]
     
-    C --> G[ResponseEntity<br>400 Bad Request]
-    D --> H[ResponseEntity<br>404 Not Found]
-    E --> I[ResponseEntity<br>400 Bad Request]
-    F --> J[ResponseEntity<br>500 Internal Server Error]
+    D --> I[ResponseEntity<br>404 Not Found]
+    E --> J[ResponseEntity<br>409 Conflict]
+    F --> K[ResponseEntity<br>400 Bad Request]
+    G --> L[ResponseEntity<br>500 Internal Server Error]
     
-    G --> K[תגובה ללקוח]
-    H --> K
-    I --> K
-    J --> K
+    I --> M[תגובה ללקוח]
+    J --> M
+    K --> M
+    L --> M
 ```
 
 <div dir="rtl">
 
-### 4. יצירת תגובות HTTP מתאימות
+### 4. קודי סטטוס HTTP ושימושם
+
+מערכת הטיפול בחריגות משתמשת בקודי סטטוס HTTP שונים בהתאם לסוג השגיאה:
+
+- **400 Bad Request**: קלט לא תקין (כמו אי התאמה בין מזהים)
+- **404 Not Found**: משאב מבוקש לא נמצא
+- **409 Conflict**: ניסיון ליצור משאב עם מזהה שכבר קיים
+- **500 Internal Server Error**: שגיאות כלליות או לא צפויות
+
+הקוד 409 Conflict מתאים במיוחד למקרים בהם יש התנגשות עם המצב הנוכחי של המערכת, כמו ניסיון להוסיף סטודנט עם ID שכבר קיים.
+
+### 5. יצירת תגובות HTTP מתאימות
 
 כל מתודת טיפול מייצרת אובייקט `ResponseEntity` שכולל:
-- קוד סטטוס HTTP מתאים (400, 404, 500 וכו')
+- קוד סטטוס HTTP מתאים (400, 404, 409, 500 וכו')
 - אובייקט `ErrorResponse` שמכיל את פרטי השגיאה
 
-### 5. דוגמאות לזריקת חריגות בשירות
+### 6. דוגמאות לזריקת חריגות בשירות
 
 השירות יכול לזרוק חריגות במקרים שונים:
 
 </div>
 
 ```java
-// במקרה שסטודנט לא נמצא
-public Student updateStudent(Student student) {
-    if (students.stream().noneMatch(s -> s.getId().equals(student.getId()))) {
-        throw new NotFoundException("Student with id " + student.getId() + " does not exist");
+public Student addStudent(Student student) {
+    if (students.stream().anyMatch(s -> s.getId().equals(student.getId()))) {
+        // now the exception is thrown, and will be handled in the ControllerAdvice GlobalExceptionHandler
+        throw new AlreadyExists("Student with id " + student.getId() + " already exists");
     }
-    // המשך הקוד...
+    students.add(student);
+    return student;
 }
 
-// במקרה של קלט לא תקין
-private void validateStudent(Student student) {
-    if (student.getFirstName() != null && student.getLastName() != null) {
-        if (student.getFirstName().equals(student.getLastName())) {
-            throw new IllegalArgumentException("First name and last name cannot be identical");
-        }
+public Student updateStudent(Student student, Long id) {
+    // check if a student exists
+    if (students.stream().noneMatch(s -> s.getId().equals(id))) {
+        // now the exception is thrown, and will be handled in the ControllerAdvice GlobalExceptionHandler
+        throw new NotExists("Student with id " + student.getId() + " does not exist");
+    }
+    if (!student.getId().equals(id)) {
+        // now the exception is thrown, and will be handled in the ControllerAdvice GlobalExceptionHandler
+        throw new StudentIdAndIdMismatch("Student with id " + id + " mismatch with body id " + student.getId());
     }
     // המשך הקוד...
 }
@@ -269,29 +277,29 @@ private void validateStudent(Student student) {
 
 ## דוגמאות לתגובות שגיאה
 
-### 1. שגיאת ולידציה (400 Bad Request)
+### 1. משאב לא נמצא (404 Not Found)
 
 </div>
 
 ```json
 {
-  "error": "Validation failed",
-  "message": "{firstName=First name must be between 2 and 50 characters, age=Age should not be less than 16}",
-  "timestamp": "2025-03-16T14:32:45.123"
+  "error": "Resource Not Found",
+  "message": "Student with id 100 does not exist",
+  "timestamp": "2025-03-16T14:33:12.456"
 }
 ```
 
 <div dir="rtl">
 
-### 2. משאב לא נמצא (404 Not Found)
+### 2. משאב כבר קיים (409 Conflict)
 
 </div>
 
 ```json
 {
-  "error": "Resource not found",
-  "message": "Student with id 100 does not exist",
-  "timestamp": "2025-03-16T14:33:12.456"
+  "error": "Resource Conflict",
+  "message": "Student with id 1 already exists",
+  "timestamp": "2025-03-16T14:33:50.789"
 }
 ```
 
@@ -303,7 +311,7 @@ private void validateStudent(Student student) {
 
 ```json
 {
-  "error": "Internal server error",
+  "error": "Internal Server Error",
   "message": "An unexpected error occurred while processing your request",
   "timestamp": "2025-03-16T14:34:01.789"
 }
@@ -311,40 +319,20 @@ private void validateStudent(Student student) {
 
 <div dir="rtl">
 
-## שגיאות ולידציה מיוחדות
-
-שגיאות ולידציה מטופלות בצורה מיוחדת. כאשר נעשה שימוש באנוטציה `@Valid` לפני פרמטר בבקר, Spring יבצע ולידציה אוטומטית לפי האנוטציות שהוגדרו במודל:
-
-</div>
-
-```java
-@PostMapping("/addStudent")
-public ResponseEntity<Object> addStudent(@Valid @RequestBody Student student) {
-    // הקוד יגיע לכאן רק אם הולידציה עברה בהצלחה
-    // ...
-}
-```
-
-<div dir="rtl">
-
-אם הולידציה נכשלת, תיזרק חריגה מסוג `MethodArgumentNotValidException` שתיתפס על ידי המטפל הגלובלי.
-
 ## יתרונות המערכת
 
 1. **הפרדת אחריות** - הקוד העסקי של הבקרים והשירותים נשאר נקי מלוגיקת טיפול בשגיאות
 2. **עקביות** - כל השגיאות מטופלות בצורה אחידה ומחזירות תגובות במבנה זהה
 3. **תחזוקתיות** - קל להוסיף או לשנות את הטיפול בסוגי שגיאות חדשים
-4. **אבטחה** - ניתן לסנן מידע רגיש משגיאות לפני שליחתן ללקוח
+4. **קודי סטטוס מדויקים** - כל סוג שגיאה מקבל קוד סטטוס HTTP מתאים (404 למשאב לא קיים, 409 להתנגשות, וכו')
 5. **חווית משתמש טובה יותר** - הלקוח מקבל הודעות שגיאה ברורות וקודי סטטוס מתאימים
-
-## סיכום
 
 מערכת הטיפול בחריגות ב-Spring Boot מספקת דרך אלגנטית ויעילה לטפל בשגיאות באפליקציית REST API:
 
 1. החריגות נזרקות במקום המתאים (בקר או שירות)
 2. מטפל החריגות הגלובלי תופס את החריגות ומתרגם אותן לתגובות HTTP מתאימות
-3. המשתמש מקבל הודעות שגיאה עקביות וקודי סטטוס מתאימים
+3. המשתמש מקבל הודעות שגיאה עקביות וקודי סטטוס מדויקים
 
-ארכיטקטורה זו מאפשרת פיתוח קוד נקי ותחזוקתי, תוך שמירה על חווית משתמש מקצועית גם במקרים של שגיאות.
+המערכת שיישמנו מדגימה את העיקרון של "הפרדת אחריות" - הקוד העסקי מתמקד בלוגיקה, והטיפול בשגיאות מרוכז במקום אחד. בנוסף, השימוש בקוד 409 Conflict לניהול התנגשויות משאבים משפר את הדיוק והבהירות של ה-API.
 
 </div>

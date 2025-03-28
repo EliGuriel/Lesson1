@@ -251,7 +251,7 @@ public ResponseEntity<Object> addStudent(@RequestBody Student student) {
 ## טיפים לשימוש יעיל
 
 1. השתמש במתודות המובנות במקום ליצור אובייקטים ידנית:
-   ```java
+   ```
    // מומלץ
    return ResponseEntity.ok(student);
    

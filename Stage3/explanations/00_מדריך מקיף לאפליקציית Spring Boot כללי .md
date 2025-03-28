@@ -17,6 +17,7 @@
 ## קוד האפליקציה
 
 ### StudentController.java
+
 ```java
 package org.example.stage3.controller;
 
@@ -32,16 +33,16 @@ import java.util.List;
 @RequestMapping("/student")
 public class StudentController {
 
-    private final StudentService studentService;
+   private final StudentService studentService;
 
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
-    }
+   public StudentController(StudentService studentService) {
+      this.studentService = studentService;
+   }
 
-    @GetMapping("/getAllStudents")
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
-    }
+   @GetMapping("/getAllStudents")
+   public List<Student> getAllStudents() {
+      return studentService.getAllStudents();
+   }
 }
 ```
 

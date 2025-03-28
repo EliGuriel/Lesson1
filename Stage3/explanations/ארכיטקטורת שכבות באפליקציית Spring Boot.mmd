@@ -1,0 +1,33 @@
+classDiagram
+    class StudentController {
+        -StudentService studentService
+        +StudentController(StudentService)
+        +getAllStudents(): List~Student~
+    }
+
+    class StudentService {
+        -List~Student~ students
+        +getAllStudents(): List~Student~
+    }
+
+    class Student {
+        -Long id
+        -String firstName
+        -String lastName
+        -double age
+        +getters()
+        +setters()
+    }
+
+    StudentController --> StudentService : uses
+    StudentService --> Student : manages
+
+    class Client {
+        HTTP Request
+    }
+
+    Client --> StudentController : HTTP GET
+
+    note for StudentController "REST API Layer\n@RestController"
+    note for StudentService "Business Logic Layer\n@Service"
+    note for Student "Data Model Layer"

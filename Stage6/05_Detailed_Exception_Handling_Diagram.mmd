@@ -1,0 +1,59 @@
+flowchart TD
+    Client([לקוח]) --> |HTTP Request| Controller
+
+    subgraph Spring["Spring Boot Web Application"]
+        Controller[["בקר<br>StudentController"]]
+        Service[["שירות<br>StudentService"]]
+        Handler[["מטפל חריגות גלובלי<br>GlobalExceptionHandler"]]
+
+        subgraph Exceptions["חריגות מותאמות אישית"]
+            NotFound["NotFoundException"]
+            IllegalArg["IllegalArgumentException"]
+            ValidationEx["MethodArgumentNotValidException"]
+        end
+
+        subgraph ModelClasses["מחלקות מודל"]
+            ErrorResp["ErrorResponse"]
+            Student["Student"]
+        end
+
+        Controller --> |1. קריאה לפעולת שירות| Service
+
+        Service --> |2a. פעולה הצליחה<br>מחזיר תוצאה| Controller
+
+        Service --> |2b. פעולה נכשלה| NotFound
+        Service --> |2b. פעולה נכשלה| IllegalArg
+
+        Controller --> |יש שגיאת ולידציה| ValidationEx
+
+    %% טיפול בחריגות ברמה לוקלית
+        NotFound --> |אם יש try-catch בבקר| Controller
+        IllegalArg --> |אם יש try-catch בבקר| Controller
+
+    %% טיפול בחריגות ברמה גלובלית
+        NotFound -.-> |אם אין try-catch בבקר<br>או חריגה 'בורחת'| Handler
+        IllegalArg -.-> |אם אין try-catch בבקר<br>או חריגה 'בורחת'| Handler
+        ValidationEx --> Handler
+
+        Handler --> |יצירת אובייקט תגובת שגיאה| ErrorResp
+        Handler --> |החזרת תגובת שגיאה| ResponseEntity
+
+    %% תגובות אפשריות
+        Controller --> |תגובה לחריגה לוקלית<br>או תגובת הצלחה| ResponseEntity["ResponseEntity"]
+
+        ResponseEntity --> |HTTP Response<br>with Status Code| Client
+    end
+
+    classDef controller fill:#4B0082,color:#FFFFFF,stroke:#000000,stroke-width:2px
+    classDef service fill:#006400,color:#FFFFFF,stroke:#000000,stroke-width:2px
+    classDef exception fill:#8B0000,color:#FFFFFF,stroke:#000000,stroke-width:2px
+    classDef handler fill:#00008B,color:#FFFFFF,stroke:#000000,stroke-width:2px
+    classDef model fill:#DAA520,color:#000000,stroke:#000000,stroke-width:2px
+    classDef response fill:#FF8C00,color:#000000,stroke:#000000,stroke-width:2px
+
+    class Controller controller
+    class Service service
+    class Handler handler
+    class NotFound,IllegalArg,ValidationEx exception
+    class ErrorResp,Student model
+    class ResponseEntity response

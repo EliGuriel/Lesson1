@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Controller as StudentController
+    participant Service as StudentService
+    participant Model as Student List
+
+    Client->>Controller: GET /student/getAllStudents
+    Note over Controller: @GetMapping("/getAllStudents")
+    Controller->>Service: getAllStudents()
+    Service->>Model: Access student list
+    Model-->>Service: Return student data
+    Service-->>Controller: Return List<Student>
+    Controller-->>Client: Return JSON response
+
+    Note over Client,Controller: HTTP Request/Response
+    Note over Controller,Service: Dependency Injection
+    Note over Service,Model: Data Access

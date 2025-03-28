@@ -1,0 +1,75 @@
+flowchart TD
+    subgraph Client["לקוח / Client"]
+        Browser["דפדפן"]
+        Postman["Postman"]
+        HTTPClient["IntelliJ HTTP Client"]
+    end
+
+    subgraph API["RESTful API"]
+        R["GET /student/getAllStudents"]
+        C["POST /student/addStudent"]
+        U["PUT /student/updateStudent"]
+        D["DELETE /student/deleteStudent/{id}"]
+    end
+
+    subgraph Controller["StudentController"]
+        GetMethod["getAllStudents()"]
+        AddMethod["addStudent(Student)"]
+        UpdateMethod["updateStudent(Student)"]
+        DeleteMethod["deleteStudent(Long)"]
+    end
+
+    subgraph Service["StudentService"]
+        GetLogic["מחזיר את כל הסטודנטים"]
+        AddLogic["בודק אם המזהה קיים ומוסיף"]
+        UpdateLogic["מעדכן סטודנט אם המזהה קיים"]
+        DeleteLogic["מוחק סטודנט אם המזהה קיים"]
+    end
+
+    subgraph Model["אחסון נתונים"]
+        DB["ArrayList<Student>"]
+    end
+
+    Browser --> API
+    Postman --> API
+    HTTPClient --> API
+
+    R --> GetMethod
+    C --> AddMethod
+    U --> UpdateMethod
+    D --> DeleteMethod
+
+    GetMethod --> GetLogic
+    AddMethod --> AddLogic
+    UpdateMethod --> UpdateLogic
+    DeleteMethod --> DeleteLogic
+
+    GetLogic --> DB
+    AddLogic --> DB
+    UpdateLogic --> DB
+    DeleteLogic --> DB
+
+    DB --> GetLogic
+    DB --> AddLogic
+    DB --> UpdateLogic
+    DB --> DeleteLogic
+
+    GetLogic --> GetMethod
+    AddLogic --> AddMethod
+    UpdateLogic --> UpdateMethod
+    DeleteLogic --> DeleteMethod
+
+    GetMethod --> R
+    AddMethod --> C
+    UpdateMethod --> U
+    DeleteMethod --> D
+
+    R --> Client
+    C --> Client
+    U --> Client
+    D --> Client
+
+%%    style R fill:#f9f,stroke:#333,stroke-width:2px
+%%    style C fill:#bbf,stroke:#333,stroke-width:2px
+%%    style U fill:#fbf,stroke:#333,stroke-width:2px
+%%    style D fill:#fbb,stroke:#333,stroke-width:2px

@@ -22,10 +22,18 @@ IntelliJ Ultimate מכיל כלי מובנה לביצוע בקשות HTTP:
 
 1. יצירת קובץ `.http` או `.rest` בפרויקט
 2. כתיבת בקשה בסיסית:
+
+</div>
+
 ```
 GET http://localhost:8080/student/getAllStudents
 Accept: application/json
 ```
+
+
+<div dir="rtl">
+
+
 3. לחיצה על האייקון "Run" ליד הבקשה
 
 יתרונות:
@@ -84,6 +92,8 @@ logging.level.org.springframework.web=DEBUG
 
 האפליקציה משתמשת בהזרקת תלויות, אחד מעקרונות היסוד של Spring:
 
+</div>
+
 ```java
 private final StudentService studentService;
 
@@ -91,6 +101,9 @@ public StudentController(StudentService studentService) {
     this.studentService = studentService;
 }
 ```
+
+
+<div dir="rtl">
 
 ### יתרונות הזרקת תלויות:
 

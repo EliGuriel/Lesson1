@@ -8,7 +8,7 @@
    - צור פרויקט Spring Boot חדש באמצעות Spring Initializr
    - בחר את התלויות הבאות: Lombok, Spring Web
    - בחר Java 17 או גרסה חדשה יותר
-   - בחר Maven או Gradle כמנהל החבילות
+   - בחר Maven כמנהל החבילות
 
 2. **הגדרת מבנה החבילות**
    - צור את מבנה החבילות בהתאם לדרישה:
@@ -34,16 +34,16 @@
    - הוסף את כל השדות הנדרשים (`id`, `firstName`, `lastName`, `age`)
    - השתמש ב-Lombok כדי להקל על הקוד:
    - הוסף את האנוטציות הבאות:
-      - `@Data` - ליצירת getters, setters, toString, equals ו-hashCode אוטומטיים
-      - `@NoArgsConstructor` - ליצירת קונסטרקטור ריק
-      - `@AllArgsConstructor` - ליצירת קונסטרקטור עם כל השדות
+      - `Data@` - ליצירת getters, setters, toString, equals ו-hashCode אוטומטיים
+      - `NoArgsConstructor@` - ליצירת קונסטרקטור ריק
+      - `AllArgsConstructor@` - ליצירת קונסטרקטור עם כל השדות
 
 ### שלב 2: יצירת שירות
 
 1. **הגדרת ממשק Service**
    - צור ממשק בשם `StudentService` בחבילת `service`
    - הגדר את החתימות של כל המתודות הנדרשות:
-      - `getAllStudents()`
+      - `()getAllStudents`
       - `addStudent(Student student)`
       - `updateStudent(Student student)`
       - `deleteStudent(Long id)`

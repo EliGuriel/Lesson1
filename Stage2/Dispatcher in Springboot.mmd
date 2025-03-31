@@ -1,0 +1,10 @@
+flowchart TD
+    A[HTTP Request] --> B[DispatcherServlet]
+    B --> C{קיים Controller?}
+    C -->|כן| D[Controller]
+    D --> E[מעבד בקשה]
+    E --> G[תשובת HTTP]
+
+    C -->|לא| F[BasicErrorController]
+    F --> G
+

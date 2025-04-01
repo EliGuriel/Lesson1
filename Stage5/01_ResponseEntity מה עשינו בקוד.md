@@ -1,40 +1,5 @@
 <div dir="rtl">
 
-# ResponseEntity בספרינג - מדריך מקיף
-
-## מהו ResponseEntity?
-
-`ResponseEntity` הוא קלאס מספריית Spring המאפשר שליטה מלאה בתגובת HTTP שמוחזרת מבקר REST. באמצעותו ניתן להגדיר את הגוף, הכותרות וקוד הסטטוס של התגובה.
-
-## יתרונות השימוש ב-ResponseEntity
-
-* שליטה מלאה בקוד הסטטוס של HTTP
-* הוספת כותרות HTTP לתגובה
-* החזרת גוף התגובה במבנה מותאם
-* שיפור האינטגרציה עם ממשקי REST
-* עיטוף מאובטח של תגובות
-
-## שימוש בסיסי ב-ResponseEntity
-
-בסיס השימוש ב-`ResponseEntity` כולל יצירת אובייקט עם:
-1. גוף התגובה (הנתונים המוחזרים)
-2. קוד סטטוס HTTP
-3. כותרות HTTP (אופציונלי)
-
-### דוגמא בסיסית
-
-</div>
-
-```java
-@GetMapping("/getAllStudents")
-public ResponseEntity<List<Student>> getAllStudents() {
-    List<Student> studentList = studentService.getAllStudents();
-    return ResponseEntity.ok(studentList); // 200 OK
-}
-```
-
-<div dir="rtl">
-
 ## מתודות שימושיות ב-ResponseEntity
 
 ### מתודות סטטיות

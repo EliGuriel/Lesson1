@@ -9,9 +9,9 @@ Servlet הוא רכיב תוכנה ב-Java שרץ בצד השרת ומשמש ל�
 ### מאפיינים עיקריים של Servlet:
 
 1. **מחזור חיים מוגדר**:
-    * `init()` - נקרא פעם אחת בתחילת חיי ה-Servlet
-    * `service()` - נקרא בכל פעם שמגיעה בקשה
-    * `destroy()` - נקרא פעם אחת בסוף חיי ה-Servlet
+   * `init()` - נקרא פעם אחת בתחילת חיי ה-Servlet
+   * `service()` - נקרא בכל פעם שמגיעה בקשה
+   * `destroy()` - נקרא פעם אחת בסוף חיי ה-Servlet
 
 2. **טיפול בבקשות**: Servlet מקבל בקשות HTTP (GET, POST, וכו') ומעבד אותן.
 
@@ -20,6 +20,26 @@ Servlet הוא רכיב תוכנה ב-Java שרץ בצד השרת ומשמש ל�
 4. **ניהול סשן**: Servlet יכול לנהל סשנים (sessions) ולשמור על מצב בין בקשות שונות.
 
 5. **מופעל בתוך Servlet Container**: Servlet רץ בתוך סביבת ריצה מיוחדת כמו Tomcat, Jetty או אפליקציות שרת אחרות התומכות ב-Java.
+
+### זרימת העבודה של Servlet מסורתי:
+
+```mermaid
+flowchart TB
+    A[HTTP Request] --> B[Servlet Container]
+    B --> C[Servlet]
+    C --> D{מחזור חיים Servlet}
+    D --> E[init]
+    D --> F[service]
+    D --> G[destroy]
+    F --> H[doGet/doPost/etc.]
+    H --> I[HttpServletResponse]
+    I --> J[HTTP Response]
+    
+%%    style A fill:#d9edf7,stroke:#31708f,stroke-width:2px,color:#31708f
+%%    style J fill:#d9edf7,stroke:#31708f,stroke-width:2px,color:#31708f
+%%    style C fill:#c4e3f3,stroke:#31708f,stroke-width:2px
+%%    style D fill:#fcf8e3,stroke:#8a6d3b,stroke-width:1px,color:#8a6d3b
+```
 
 ### דוגמה בסיסית של Servlet מסורתי:
 
@@ -76,11 +96,34 @@ Spring Boot הוא מסגרת עבודה המבוססת על Spring ומספקת
 
 ### ה-DispatcherServlet ב-Spring Boot:
 
-1. **הרשמה אוטומטית**: Spring Boot מרשים אוטומטית את ה-DispatcherServlet ללא צורך בקובצי קונפיגורציה כמו web.xml.
+1. **הרשמה אוטומטית**: Spring Boot רושם אוטומטית את ה-DispatcherServlet ללא צורך בקובצי קונפיגורציה כמו web.xml.
 
 2. **רכיב מרכזי**: ה-DispatcherServlet משמש כ"שער כניסה" לכל הבקשות ומנתב אותן לבקרים (Controllers) המתאימים.
 
 3. **החלפת כתיבת Servlet ידני**: במקום לכתוב Servlet בצורה ידנית, מפתחים משתמשים ב-Controllers המוגדרים באמצעות אנוטציות.
+
+### זרימת העבודה ב-Spring Boot:
+
+```mermaid
+flowchart TB
+    A[HTTP Request] --> B[Embedded Server]
+    B --> C[DispatcherServlet]
+    C --> D[HandlerMapping]
+    D --> E[Controller]
+    E --> F{סוגי תגובות}
+    F --> G[ModelAndView]
+    F --> H[ResponseEntity/Rest]
+    G --> I[ViewResolver]
+    I --> J[View]
+    H --> K[MessageConverter]
+    J --> L[HTTP Response]
+    K --> L
+    
+%%    style A fill:#d9edf7,stroke:#31708f,stroke-width:2px,color:#31708f
+%%    style L fill:#d9edf7,stroke:#31708f,stroke-width:2px,color:#31708f
+%%    style C fill:#f2dede,stroke:#a94442,stroke-width:2px
+%%    style F fill:#fcf8e3,stroke:#8a6d3b,stroke-width:1px,color:#8a6d3b
+```
 
 ### דוגמה ל-Controller ב-Spring Boot:
 
@@ -93,60 +136,17 @@ import org.springframework.web.bind.annotation.RestController;
 // Marks this class as a REST controller which automatically handles HTTP requests
 @RestController
 public class HelloController {
-    
-    // Maps HTTP GET requests to the "/hello" path to this method
-    @GetMapping("/hello")
-    public String hello() {
-        // Returns a simple string as the response body
-        // Spring Boot automatically converts this to HTTP response with content type text/plain
-        return "Hello, World!";
-    }
+
+   // Maps HTTP GET requests to the "/hello" path to this method
+   @GetMapping("/hello")
+   public String hello() {
+      // Returns a simple string as the response body
+      // Spring Boot automatically converts this to HTTP response with content type text/plain
+      return "Hello, World!";
+   }
 }
 ```
 
-<div dir="rtl">
-
-### כיצד Spring Boot מגדיר ומנהל Servlet:
-
-1. **אוטו-קונפיגורציה**: Spring Boot מגדיר אוטומטית את ה-DispatcherServlet ומרשים אותו ב-Servlet Container.
-
-2. **הגדרות מותאמות אישית**:
-
-
-</div>
-
-
-```java
-@Configuration
-public class WebConfig {
-    @Bean
-    public ServletRegistrationBean<MyServlet> myServletRegistration() {
-        // Create a registration bean that maps MyServlet to the "/custom/*" URL pattern
-        ServletRegistrationBean<MyServlet> registration = new ServletRegistrationBean<>(
-            new MyServlet(), "/custom/*");
-        
-        // Set the servlet to load on startup with priority 1
-        registration.setLoadOnStartup(1);
-        return registration;
-    }
-}
-```
-
-
-<div dir="rtl">
-
-
-3. **הגדרות באמצעות application.properties**:
-
-</div>
-
-```properties
-# Set the base path for the DispatcherServlet
-spring.mvc.servlet.path=/api
-
-# Configure the session timeout to 30 minutes
-server.servlet.session.timeout=30m
-```
 
 <div dir="rtl">
 
@@ -163,31 +163,12 @@ server.servlet.session.timeout=30m
 ## טיפול בשגיאות ב-Spring Boot:
 
 1. **הטיפול בבקשות שאין להן Controller מתאים**:
-    * ב-Spring Boot, ה-DispatcherServlet מעביר את הבקשה ל-BasicErrorController מובנה
-    * ניתן להתאים אישית את התנהגות השגיאה:
-        * יצירת templates/error/404.html
-        * דריסת BasicErrorController
-        * שימוש ב-ExceptionHandler
+   * ב-Spring Boot, ה-DispatcherServlet מעביר את הבקשה ל-BasicErrorController מובנה
+   * ניתן להתאים אישית את התנהגות השגיאה:
+      * יצירת templates/error/404.html
+      * דריסת BasicErrorController
+      * שימוש ב-ExceptionHandler
 
-2. **אפשרויות קונפיגורציה**:
-
-</div>
-
-```properties
-# Enable exception throwing when no handler is found for a request
-spring.mvc.throw-exception-if-no-handler-found=true
-
-# Disable default static resource mappings
-spring.web.resources.add-mappings=false
-
-# Configure error page details
-server.error.include-stacktrace=never
-server.error.include-message=always
-```
-
-<div dir="rtl">
-
-## סיכום:
 
 Spring Boot משתמש ב-Servlet כבסיס לטיפול בבקשות HTTP, אך מסתיר את רוב המורכבות מאחורי הפשטות וקונבנציות. ה-DispatcherServlet מהווה את ליבת המערכת ופועל כ"שער כניסה" לכל הבקשות, כאשר הוא מנתב אותן לבקרים (Controllers) המתאימים.
 

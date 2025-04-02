@@ -11,7 +11,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/students")
 public class StudentController {
 
     private final StudentService studentServiceImpl;
@@ -20,13 +20,13 @@ public class StudentController {
         this.studentServiceImpl = studentServiceImpl;
     }
 
-    @GetMapping("/getAllStudents")
+    @GetMapping()
     public ResponseEntity<List<Student>> getAllStudents() {
         List<Student> studentList = studentServiceImpl.getAllStudents();
         return ResponseEntity.ok(studentList); // 200 OK
     }
 
-    @PostMapping("/addStudent")
+    @PostMapping()
     public ResponseEntity<Student> addStudent(@RequestBody Student student) {
         Student added = studentServiceImpl.addStudent(student);
 
@@ -39,13 +39,13 @@ public class StudentController {
         return ResponseEntity.created(location).body(added); // 201 Created
     }
 
-    @PutMapping("/updateStudent/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Student> updateStudent(@RequestBody Student student, @PathVariable Long id) {
         Student updated = studentServiceImpl.updateStudent(student, id);
         return ResponseEntity.ok(updated); // 200 OK
     }
 
-    @DeleteMapping("/deleteStudent/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
         studentServiceImpl.deleteStudent(id);
         return ResponseEntity.noContent().build(); // 204 No Content

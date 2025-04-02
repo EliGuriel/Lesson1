@@ -1,5 +1,4 @@
 HELP.md
-תסריט הדרכה להשתלמות Spring Boot.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

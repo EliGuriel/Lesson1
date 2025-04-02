@@ -196,16 +196,24 @@ Git היא מערכת בקרת גרסאות מבוזרת שנוצרה על יד�
 
 הגדר את שם המשתמש והאימייל שלך בטרמינל (או בטרמינל המשולב ב-IntelliJ):
 
+</div>
+
 ```bash
 git config --global user.name "השם שלך"
 git config --global user.email "האימייל שלך"
 ```
 
+<div dir="rtl">
+
 שים לב: כברירת מחדל, הענף הראשי בפרויקטים חדשים נקרא כיום "main" ולא "master". אם ברצונך לשנות ענף קיים:
+
+</div>
 
 ```bash
 git branch -m master main
 ```
+
+<div dir="rtl">
 
 #### הגדרת Git ב-IntelliJ IDEA
 
@@ -287,6 +295,9 @@ git branch -m master main
 ענפים מאפשרים פיתוח מקביל של תכונות שונות:
 
 #### יצירת ענף חדש
+
+</div>
+
 ```bash
 git branch new-feature
 git checkout new-feature
@@ -295,12 +306,22 @@ git checkout new-feature
 git checkout -b new-feature
 ```
 
+<div dir="rtl">
+
 #### מעבר בין ענפים
+
+</div>
+
 ```bash
 git checkout branch-name
 ```
 
+<div dir="rtl">
+
 #### מיזוג ענפים
+
+</div>
+
 ```bash
 # עבור לענף היעד (בדרך כלל main)
 git checkout main
@@ -309,10 +330,17 @@ git checkout main
 git merge new-feature
 ```
 
+<div dir="rtl">
+
 #### דחיפת ענף חדש ל-GitHub
+
+</div>
+
 ```bash
 git push -u origin new-feature
 ```
+
+<div dir="rtl">
 
 ### ביטול שינויים והחזרת גרסאות קודמות
 
@@ -326,6 +354,9 @@ Git מאפשר לבטל שינויים בכל אחד מהשלבים במחזור
 לחץ ימני על הקובץ > `Local History` > `Show History` > בחר גרסה קודמת > `Revert`
 
 **באמצעות טרמינל**:
+
+</div>
+
 ```bash
 # ביטול שינויים בקובץ ספציפי
 git restore filename.txt
@@ -337,6 +368,8 @@ git checkout -- filename.txt
 git restore .
 ```
 
+<div dir="rtl">
+
 #### ביטול שינויים שכבר נוספו ל-Staging
 
 כאשר כבר הוספת קבצים ל-Staging (ביצעת `git add`) אך עדיין לא ביצעת commit:
@@ -344,6 +377,8 @@ git restore .
 **באמצעות IntelliJ IDEA**:
 1. פתח את חלון ה-Git (`Alt+9`) > לשונית "Local Changes" > "Staged" > לחץ ימני על הקובץ > `Unstage Changes`
 2. לאחר הסרה מ-Staging, השתמש באחת השיטות מהסעיף הקודם לביטול השינויים עצמם
+
+</div>
 
 **באמצעות טרמינל**:
 ```bash
@@ -357,6 +392,8 @@ git restore --staged .
 git restore --staged filename.txt && git restore filename.txt
 ```
 
+<div dir="rtl">
+
 #### ביטול Commit אחרון (עם שמירת השינויים)
 
 לביטול commit אחרון תוך השארת השינויים כשינויים פעילים:
@@ -369,10 +406,16 @@ git restore --staged filename.txt && git restore filename.txt
 5. אשר את הפעולה
 
 **באמצעות טרמינל**:
+
+## ביטול ה-commit האחרון עם שמירת השינויים
+</div>
+
 ```bash
-# ביטול ה-commit האחרון עם שמירת השינויים
+
 git reset --soft HEAD~1
 ```
+
+<div dir="rtl">
 
 #### ביטול Commit אחרון (כולל מחיקת השינויים)
 
@@ -386,10 +429,15 @@ git reset --soft HEAD~1
 5. אשר את הפעולה
 
 **באמצעות טרמינל**:
+
+# ביטול ה-commit האחרון כולל מחיקת השינויים#
+</div>
+
 ```bash
-# ביטול ה-commit האחרון כולל מחיקת השינויים
 git reset --hard HEAD~1
 ```
+
+<div dir="rtl">
 
 ## GitHub - שיתוף ועבודת צוות
 
@@ -460,9 +508,15 @@ target/
     - העתק את כתובת ה-URL של המאגר (HTTPS או SSH)
 
 2. **בטרמינל המקומי**:
+
+
+</div>
+
    ```bash
    git clone https://github.com/username/repository-name.git
    ```
+
+<div dir="rtl">
 
 3. **ב-IntelliJ IDEA**:
     - בחר `File > New > Project from Version Control`
@@ -474,6 +528,9 @@ target/
 לאחר ביצוע שינויים ו-commit מקומי, כדי לעדכן את המאגר ב-GitHub:
 
 1. **בטרמינל**:
+
+</div>
+
    ```bash
    # ראשית, ודא שאתה בענף הנכון
    git branch
@@ -485,6 +542,8 @@ target/
    git push origin main
    ```
 
+<div dir="rtl">
+
 2. **ב-IntelliJ IDEA**:
     - `Ctrl+Shift+K` או `Git > Push`
     - בחר את הענף ליעד ולחץ על "Push"
@@ -494,6 +553,9 @@ target/
 כאשר יש שינויים במאגר המרוחק שברצונך לקבל למחשב המקומי:
 
 1. **בטרמינל**:
+
+</div>
+
    ```bash
    # משיכת השינויים מהשרת המרוחק
    git pull origin branch-name
@@ -501,6 +563,8 @@ target/
    # לענף main
    git pull origin main
    ```
+
+<div dir="rtl">
 
 2. **ב-IntelliJ IDEA**:
     - `Ctrl+T` או `Git > Pull`

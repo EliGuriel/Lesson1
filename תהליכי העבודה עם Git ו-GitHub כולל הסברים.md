@@ -6,11 +6,26 @@
 
 ```mermaid
 graph LR
-%% הגדרת הצמתים העיקריים
-    A["Working Directory\nשינויים מקומיים"]
-    B["Staging Area\nשינויים מוכנים"]
-    C["Local Repository\nשינויים ששמרת ב-commit"]
-    D["Remote Repository\nמאגר ב-GitHub"]
+%% הגדרת תתי-מקטעים
+    subgraph WorkingDirectory [Working Directory]
+        A["Working Directory\nשינויים מקומיים"]
+        A2["שינויים מקומיים שטרם"]
+        A3[" Staging הוכנסו אל "]
+    end
+
+    subgraph GitLocal [Git Local]
+        B["Staging Area\nשינויים מוכנים"]
+        C["Local Repository\ncommit  שינויים ששמרת  על ידי"]
+        E["New Branch\nענף חדש"]
+        F["History\nהיסטוריית שינויים"]
+    end
+
+    subgraph GitHub [GitHub]
+        D["Remote Repository\nמאגר GitHub"]
+        G["Pull Request\nבקשת משיכה"]
+        H["Issues\nמעקב משימות"]
+        I["Actions\nאוטומציה CI/CD"]
+    end
 
 %% הקשרים הבסיסיים
     A -->|"git add"| B
@@ -23,46 +38,45 @@ graph LR
     C -->|"git reset --soft"| B
     C -->|"git reset --hard"| A
 
-%% פעולות Checkout
-    C -->|"git checkout -- file"| A
-    C -->|"git checkout commit -- file"| B
-
 %% ענפים והיסטוריה
-    E["New Branch\nענף חדש"]
-    F["History\nהיסטוריית שינויים"]
-
     C -->|"git branch"| E
     C -->|"git log"| F
 
-%% מעבר בין ענפים
-    E -->|"git checkout branch"| A
-
 %% פעולות GitHub
-    G["Pull Request\nבקשת משיכה"]
-    H["Issues\nמעקב משימות"]
-    I["Actions\nאוטומציה CI/CD"]
-
     D -->|"Create"| G
     D -->|"Track"| H
     D -->|"Automate"| I
 
-%% קבצי MMD
-    J["Markdown (.md)\nתיעוד רגיל"]
-    K["MultiMarkdown (.mmd)\nתיעוד מורחב"]
-    L["Mermaid\nתרשימים בקוד"]
+%% עיצוב צבעים לפי מקטעים
+    classDef workingDir fill:#7e0073,stroke:#787878,stroke-width:2px, font-size:20px
+    classDef gitLocal fill:#007e00,stroke:#333,stroke-width:2px, font-size:20px
+    classDef github fill:#123454,stroke:#656556,stroke-width:2px, font-size:20px
 
-    C -.->|"Contains"| J
-    C -.->|"Contains"| K
-    C -.->|"Contains"| L
+%% עיצוב תתי-מקטעים
+    classDef workingDirSection fill:#7e0073,stroke:#787878,stroke-width:2px, font-size:1em
+    classDef gitLocalSection fill:#007e00,stroke:#333,stroke-width:2px, font-size:1em
+    classDef githubSection fill:#123454,stroke:#656556,stroke-width:2px, font-size:1em
 
-%% כללי
-    classDef local fill:#344343,stroke:#333,stroke-width:1px;
-    classDef remote fill:#123454,stroke:#0366d6,stroke-width:1px;
-    classDef doc fill:#232323,stroke:#79b52c,stroke-width:1px;
+%% הגדרת צבעים לפי קבוצות
+    class A workingDir
+    class B,C,E,F gitLocal
+    class D,G,H,I github
 
-    class A,B,C,E,F local;
-    class D,G,H,I remote;
-    class J,K,L doc;
+
+%% הגדרת צבעי קשתות לפי מקור
+    linkStyle 0 stroke:#7e0073,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 4 stroke:#7e0073,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 1 stroke:#007e00,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 2 stroke:#007e00,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 6 stroke:#7e0073,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 7 stroke:#007e00,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 8 stroke:#007e00,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 3 stroke:#7e0073,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 9 stroke:#123454,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 10 stroke:#123454,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 11 stroke:#123454,stroke-width:2px, font-size:20px, weight: bold
+    linkStyle 5 stroke:#007e00,stroke-width:2px, font-size:20px, weight: bold
+
 ```
 
 ## הסבר התרשים
@@ -209,7 +223,6 @@ graph LR
 | `git reset --soft` | כל הפרויקט | כן (נשארים ב-staging) | ביטול commit תוך שמירת השינויים | משנה את ה-HEAD |
 | `git reset --hard` | כל הפרויקט | לא (מוחק שינויים) | חזרה למצב נקי של commit | פעולה הרסנית, משנה את ה-HEAD |
 
-## סיכום
 
 התרשים מציג את מחזור החיים המלא של שינויי קוד ומסמכים בסביבת Git ו-GitHub, עם דגש על פעולות Checkout. הוא ממחיש:
 
